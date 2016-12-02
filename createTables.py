@@ -32,6 +32,7 @@ def create_student_quarter_data_table(conn):
                        "class char(2),"
                        "major char(4),"
                        "prefname varchar(30),"
+                       "surname varchar(30),"
                        "id integer references FakeU.student,"
                        "term integer,"
                        "PRIMARY KEY(id, term)"
