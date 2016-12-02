@@ -1,22 +1,14 @@
 import csv
 
 with open('2012_Q1.csv') as csvfile:
-    reader = csv.DictReader(csvfile)
-    entry = []
-    entry_start = 0
-
-    for row in reader:
-        row_read = csv.DictReader(row)
-        for col in csv_read:
-            if col == 'CID':
-                entry_start = """get the row's number"""
-                #set end point
-            #get all the rows as one entry and append into entry list
-            
-            #then parse for each entry list, check each row if column starts with CID, INSTRUCTOR(S) or SEAT
-            #from row with CID up to row with INSTRUCTORS: parse in the tuples for the course
-            #from row INSTRUCTORS to SEAT, parse in for the meetings etc.
-            #from the SEAT to the end of the entry, parse in the student and student data
-            
-            #then move on to next entry.
+    row_read = csv.DictReader(csvfile)
     
+    for row in row_read:
+        flag = 0
+        for col in row:
+            if col == 'CID' or col == 'INSTRUCTOR(S)' or col == 'SEAT' or row == '':
+                flag = 1
+        if flag == 1:
+            continue
+        else:
+            print(row)
