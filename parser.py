@@ -1,4 +1,5 @@
 import csv
+import os
 
 
 def parse_quarter(filename):
@@ -43,5 +44,7 @@ def parse_quarter(filename):
 
 
 if __name__ == "__main__":
-    x = parse_quarter("2011_Q4.csv")
+    althings = []
+    for filename in os.listdir('data/Grades/'):
+        althings += parse_quarter(filename)
     pass
