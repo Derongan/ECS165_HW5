@@ -7,6 +7,9 @@ def parse_quarter(filename):
 
     last_course = {}
 
+    student = {}
+    student_quarter_data = {}
+
     with open("data/Grades/{}".format(filename)) as fp:
         reader = csv.reader(fp, skipinitialspace=True)
         next(reader)  # Skip initial blank
@@ -28,6 +31,18 @@ def parse_quarter(filename):
             elif reading_instructor:
                 last_course['meetings'].append(row)
             elif reading_student:
+                # Commented out test that made sure emails always match on IDs. They do. Yay.
+                # assert(students.get(row[1], None) is None or students[row[1]]['email'] == row[10])
+                student[row[1]] = {'id': row[1], 'email': row[10]}
+                student_quarter_data[(row[1], last_course['data'][1])] = {
+                    'id': row[1],
+                    'term': last_course['data'][1],
+                    'level': row[4],
+                    'class': row[6],
+                    'major': row[7],
+                    'prefname': row[3],
+                    'surname': row[2]
+                }
                 last_course['students'].append(row)
             elif first == 'CID':
                 reading_course = True
@@ -40,11 +55,10 @@ def parse_quarter(filename):
                 reading_student = True
 
         courses.append(last_course)
-        return courses
+        return {'student': student}
 
 
 if __name__ == "__main__":
-    althings = []
     for filename in os.listdir('data/Grades/'):
-        althings += parse_quarter(filename)
+        result = parse_quarter(filename)
     pass
