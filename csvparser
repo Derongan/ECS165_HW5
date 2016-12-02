@@ -1,14 +1,9 @@
 import csv
 
-with open('2012_Q1.csv') as csvfile:
-    row_read = csv.DictReader(csvfile)
-    
+with open('2012_Q1.csv', newline='') as csvfile:
+    row_read = csv.reader(csvfile)
     for row in row_read:
-        flag = 0
-        for col in row:
-            if col == 'CID' or col == 'INSTRUCTOR(S)' or col == 'SEAT' or row == '':
-                flag = 1
-        if flag == 1:
+        if row == '':
             continue
         else:
             print(row)
