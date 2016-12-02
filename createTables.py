@@ -55,7 +55,8 @@ def create_meeting_table(conn):
     with conn.cursor() as cursor:
         cursor.execute("CREATE TABLE IF NOT EXISTS FakeU.meeting ("
                        "days varchar(7),"
-                       "time tsrange,"
+                       "starttime time,"
+                       "endtime time,"
                        "type varchar(10),"
                        "building char(3),"
                        "room integer,"
