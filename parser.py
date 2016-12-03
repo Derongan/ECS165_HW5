@@ -70,15 +70,15 @@ def parse_quarter(filename):
                     'surname': row[2]
                 }
                 
-                student_course[(data[1], data[0], data[4])] = {
+                student_course[(row[1], data[0], data[1], data[4])] = {
+                    'id': row[1],
                     'term': data[1],
                     'cid': data[0],
                     'section': data[4],
                     'units': row[5],
                     'seat': row[0],
                     'status': row[10],
-                    'grade': row[9],
-                    'id': row[1]
+                    'grade': row[9]
                 }
                 last_course['students'].append(row)
             elif first == 'CID':
