@@ -14,6 +14,7 @@ def parse_quarter(filename):
     meeting = {}
     student = {}
     student_quarter_data = {}
+    student_course = {}
 
     with open("data/Grades/{}".format(filename)) as fp:
         reader = csv.reader(fp, skipinitialspace=True)
@@ -56,24 +57,37 @@ def parse_quarter(filename):
             elif reading_student:
                 # Commented out test that made sure emails always match on IDs. They do. Yay.
                 # assert(students.get(row[1], None) is None or students[row[1]]['email'] == row[10])
+
+                data = last_course["data"]
                 student[row[1]] = {'id': row[1], 'email': row[10]}
-                student_quarter_data[(row[1], last_course['data'][1])] = {
+                student_quarter_data[(row[1], data[1])] = {
                     'id': row[1],
-                    'term': last_course['data'][1],
+                    'term': data[1],
                     'level': row[4],
                     'class': row[6],
                     'major': row[7],
                     'prefname': row[3],
                     'surname': row[2]
                 }
+                
+                student_course[(data[1], data[0], data[4])] = {
+                    'term': data[1],
+                    'cid': data[0],
+                    'section': data[4],
+                    'units': row[5],
+                    'seat': row[0],
+                    'status': row[10],
+                    'grade': row[9],
+                    'id': row[1]
+                }
                 last_course['students'].append(row)
             elif first == 'CID':
                 reading_course = True
                 if last_course and not last_course['students']:
                     data = last_course["data"]
-                    courses[(data[0], data[1], data[4])] = {
-                        'cid': data[0],
+                    courses[(data[1], data[0], data[4])] = {
                         'term': data[1],
+                        'cid': data[0],
                         'section': data[4],
                         'subject': data[2],
                         'crse': data[3],
@@ -95,6 +109,7 @@ def parse_quarter(filename):
         return {
             'student': student,
             'studentquarterdata': student_quarter_data,
+            'studentcourse': student_course,
             'course': courses,
             'meeting': meeting
         }
