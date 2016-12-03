@@ -41,12 +41,18 @@ def parse_quarter(filename):
                 # no instructor can be at two places at the same day and time
                 # but check for overlapping days
 
+                if not row[3]:
+                    times = [None, None]
+                else:
+                    times = row[3].split('-')
+
                 if first:
                     last_prof = first
                 temp_meet[(data[1], row[2], row[3], row[4], row[5])] = {
                     'term': data[1],
-                    'time': row[2],
-                    'days': row[3],
+                    'starttime': times[0],
+                    'endtime': times[1],
+                    'days': row[2],
                     'building': row[4],
                     'room': row[5],
                     'instructor': last_prof,
