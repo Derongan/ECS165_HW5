@@ -47,7 +47,7 @@ def create_course_table(conn):
                        "section integer,"
                        "subject char(3),"
                        "crse integer,"
-                       "units int4range,"
+                       "units numrange,"
                        "PRIMARY KEY(term, cid, section)"
                        ");")
 

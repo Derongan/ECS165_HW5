@@ -1,5 +1,6 @@
 import csv
 import os
+from psycopg2.extras import NumericRange
 
 
 def parse_quarter(filename):
@@ -60,6 +61,10 @@ def parse_quarter(filename):
 
                 data = last_course["data"]
                 student[row[1]] = {'id': row[1], 'email': row[10]}
+
+                # if (row[1], last_course['data'][1]) in student_quarter_data:
+                    # We need a check here for summer data!
+
                 student_quarter_data[(row[1], data[1])] = {
                     'id': row[1],
                     'term': data[1],
@@ -85,13 +90,16 @@ def parse_quarter(filename):
                 reading_course = True
                 if last_course and not last_course['students']:
                     data = last_course["data"]
+
+                    unit_vals = tuple(float(x) for x in data[-1].split("-"))
+
                     courses[(data[1], data[0], data[4])] = {
                         'term': data[1],
                         'cid': data[0],
                         'section': data[4],
                         'subject': data[2],
                         'crse': data[3],
-                        'units': data[-1]  # needs formatting as range
+                        'units': NumericRange(min(unit_vals), max(unit_vals), '[]') # needs formatting as range
                     }
                     meeting.update(temp_meet)
 
