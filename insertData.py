@@ -4,41 +4,22 @@ from psycopg2.extensions import AsIs
 import os
 
 
-def insert_students(conn, stdict):
+def insert_data(conn, table, stdict, suffix = b''):
     with conn.cursor() as cursor:
-        students = list(stdict.values())
+        items = list(stdict.values())
 
-        if not students:
+        if not items:
             return
 
-        keys = tuple(students[0].keys())
+        keys = tuple(items[0].keys())
 
         # Syntax for AsIs found by consulting:
         # http://stackoverflow.com/questions/29461933/insert-python-dictionary-using-psycopg2
-        values = b','.join([cursor.mogrify('%s', (tuple(student.values()),)) for student in students])
+        values = b','.join([cursor.mogrify('%s', (tuple(item.values()),)) for item in items])
 
-        statement = cursor.mogrify("INSERT INTO FakeU.student (%s) VALUES ", (AsIs(",".join(keys)),))
+        statement = cursor.mogrify("INSERT INTO FakeU."+table+" (%s) VALUES ", (AsIs(",".join(keys)),))
 
-        cursor.execute(statement+values + b"ON CONFLICT DO NOTHING")
-
-
-
-def insert_students_quarter(conn, stdict):
-    with conn.cursor() as cursor:
-        students = list(stdict.values())
-
-        if not students:
-            return
-
-        keys = tuple(students[0].keys())
-
-        # Syntax for AsIs found by consulting:
-        # http://stackoverflow.com/questions/29461933/insert-python-dictionary-using-psycopg2
-        values = b','.join([cursor.mogrify('%s', (tuple(student.values()),)) for student in students])
-
-        statement = cursor.mogrify("INSERT INTO FakeU.StudentQuarterData (%s) VALUES ", (AsIs(",".join(keys)),))
-
-        cursor.execute(statement+values)
+        cursor.execute(statement + values + suffix)
 
 
 if __name__ == "__main__":
@@ -46,6 +27,6 @@ if __name__ == "__main__":
         for filename in os.listdir('data/Grades/'):
             result = parse_quarter(filename)
 
-            insert_students(conn, result['student'])
-
-            insert_students_quarter(conn, result['studentquarterdata'])
+            insert_data(conn, 'student', result['student'], b"ON CONFLICT DO NOTHING")
+            insert_data(conn, 'StudentQuarterData', result['studentquarterdata'], b"ON CONFLICT DO NOTHING")
+            insert_data(conn, 'course', result['course'])
