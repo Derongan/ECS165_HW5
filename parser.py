@@ -47,7 +47,8 @@ def parse_quarter(filename):
             elif first == 'CID':
                 reading_course = True
                 if last_course:
-                    courses.append(last_course)
+                    if last_course['students']: #ignores courses which has no students in it
+                        courses.append(last_course)
                 last_course = {'students': [], 'meetings': []}
             elif first == 'INSTRUCTOR(S)':
                 reading_instructor = True
