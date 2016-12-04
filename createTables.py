@@ -59,7 +59,7 @@ def create_meeting_table(conn):
                        "days varchar(7),"
                        "starttime time,"
                        "endtime time,"
-                       "type varchar(10),"
+                       "type varchar(30),"
                        "building char(3),"
                        "room integer,"
                        "instructor varchar(30),"
