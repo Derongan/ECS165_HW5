@@ -28,6 +28,9 @@ def parse_quarter(filename):
         reading_student = False
 
         for row in reader:
+
+            row = [x if x != "" else None for x in row]
+
             first = row[0]
 
             if len(row) <= 1:
@@ -50,6 +53,7 @@ def parse_quarter(filename):
 
                 if first:
                     last_prof = first
+
                 temp_meet = {
                     'term': data[1],
                     'starttime': times[0],
@@ -96,7 +100,7 @@ def parse_quarter(filename):
                 last_course['students'].append(row)
             elif first == 'CID':
                 reading_course = True
-                if last_course and not last_course['students']:
+                if last_course and last_course['students']:
                     data = last_course["data"]
 
                     unit_vals = tuple(float(x) for x in data[-1].split("-"))
@@ -109,7 +113,8 @@ def parse_quarter(filename):
                         'crse': data[3],
                         'units': NumericRange(min(unit_vals), max(unit_vals), '[]') # needs formatting as range
                     }
-                    meeting.append(temp_meet)
+                    if temp_meet:
+                        meeting.append(temp_meet)
 
                     all_courses.append(last_course)
 
