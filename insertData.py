@@ -6,7 +6,11 @@ import os
 
 def insert_data(conn, table, stdict, suffix = b''):
     with conn.cursor() as cursor:
-        items = list(stdict.values())
+
+        if type(stdict) is dict:
+            items = list(stdict.values())
+        else:
+            items = stdict
 
         if not items:
             return
