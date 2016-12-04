@@ -74,7 +74,7 @@ def create_meeting_table(conn):
 def create_student_course_table(conn):
     with conn.cursor() as cursor:
         cursor.execute("CREATE TABLE IF NOT EXISTS FakeU.studentcourse ("
-                       "units integer,"
+                       "units real,"
                        "seat integer,"
                        "status char(2),"
                        "grade varchar(3),"

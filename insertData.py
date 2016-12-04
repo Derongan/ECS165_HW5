@@ -41,4 +41,3 @@ if __name__ == "__main__":
             insert_data(conn, 'studentcourse', result['studentcourse'])
 
             print("Finished file {}".format(filename))
-            break
