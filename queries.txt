@@ -9,9 +9,9 @@ SELECT
   ((COUNT (DISTINCT id))/ (SUM (totalstudents)/ COUNT (totalstudents))) * 100 AS percentstudents , term, unitstaken
 
 FROM 
-  (SELECT SUM(studentcourse.units AS unitstaken), term, id, COUNT(DISTINCT id) AS totalstudents 
+  (SELECT SUM(FakeU.studentcourse.units) AS unitstaken, term, id, COUNT(DISTINCT id) AS totalstudents 
 
-  FROM course NATURAL JOIN studentcourse
+  FROM FakeU.course NATURAL JOIN FakeU.studentcourse
 
   WHERE (subject = 'ABC' OR subject = 'DEF') GROUP BY term, id)
 
@@ -33,12 +33,12 @@ SELECT
   AVG(gpacount.gradepointaverage) AS averagegpa, unitstaken, term
 
 FROM
-  (SELECT SUM(studentcourse.units) AS unitstaken, term, id, COUNT(DISTINCT id) AS totalstudents
-  FROM course NATURAL JOIN studentcourse
+  (SELECT SUM(FakeU.studentcourse.units) AS unitstaken, term, id, COUNT(DISTINCT id) AS totalstudents
+  FROM FakeU.course NATURAL JOIN FakeU.studentcourse
   WHERE (subject = 'ABC' OR subject = 'DEF') GROUP BY term, id) unitcount,
 
   (SELECT SUM(points*units)/SUM(units) AS gradepointaverage, id, term
-  FROM studentcourse NATURAL JOIN gpa
+  FROM FakeU.studentcourse NATURAL JOIN FakeU.gpa
   GROUP BY id, term) gpacount
     
 WHERE
@@ -54,11 +54,11 @@ FROM
   (SELECT
     point, id, term, cid, section
   FROM
-    studentcourse NATURAL JOIN gpa) gpacount,
+    FakeU.studentcourse NATURAL JOIN FakeU.gpa) gpacount,
   (SELECT
     instructor, cid, term, section
   FROM
-    meeting) instructordata
+    FakeU.meeting) instructordata
 WHERE
   (gpacount.cid = instructordata.cid AND gpacount.term = instructordata.term AND gpacount.section = instructordata.section)
   GROUP BY
