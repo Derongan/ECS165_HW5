@@ -1,0 +1,15 @@
+3F)
+
+SELECT major, grade, COUNT(grade) AS counter, studentcourse.units
+FROM FakeU.studentquarterdata
+JOIN FakeU.studentcourse USING (id, term)
+JOIN FakeU.course USING (cid, term)
+WHERE subject = 'ABC' GROUP BY studentcourse.units, grade, major ORDER BY major
+
+3G)
+
+SELECT (studentquarterdata1.major) AS oldmajor , COUNT(DISTINCT studentquarterdata1.id) AS totalstudents
+FROM FakeU.studentquarterdata AS studentquarterdata1
+CROSS JOIN FakeU.studentquarterdata AS studentquarterdata2
+WHERE (studentquarterdata1.id = studentquarterdata2.id AND studentquarterdata2.major = 'ABC') AND NOT studentquarterdata1.major= 'ABC'
+GROUP BY studentquarterdata1.major
