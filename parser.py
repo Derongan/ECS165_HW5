@@ -9,7 +9,7 @@ def parse_quarter(filename):
     last_prof = None
 
     last_course = {}
-    temp_meet = {}
+    temp_meet = []
 
     courses = {}
 
@@ -32,6 +32,9 @@ def parse_quarter(filename):
             row = [x if x != "" else None for x in row]
 
             first = row[0]
+
+            if first == "49148":
+                print("WTF")
 
             if len(row) <= 1:
                 reading_course = False
@@ -61,12 +64,12 @@ def parse_quarter(filename):
                         'units': NumericRange(min(unit_vals), max(unit_vals), '[]')  # needs formatting as range
                     }
                     if temp_meet:
-                        meeting.append(temp_meet)
+                        meeting.extend(temp_meet)
 
                     all_courses.append(last_course)
 
                 last_course = {'students': [], 'meetings': []}
-                temp_meet = {}
+                temp_meet = []
                 last_prof = None
             elif reading_instructor:
                 data = last_course["data"]
@@ -82,7 +85,7 @@ def parse_quarter(filename):
                 if first:
                     last_prof = first
 
-                temp_meet = {
+                temp_meet.append({
                     'term': data[1],
                     'starttime': times[0],
                     'endtime': times[1],
@@ -93,7 +96,7 @@ def parse_quarter(filename):
                     'type': row[1],
                     'cid': data[0],
                     'section': data[4]
-                }
+                })
                 last_course['meetings'].append(row)
             elif reading_student:
                 # Commented out test that made sure emails always match on IDs. They do. Yay.
@@ -102,8 +105,7 @@ def parse_quarter(filename):
                 data = last_course["data"]
                 student[row[1]] = {'id': row[1], 'email': row[10]}
 
-                # if (row[1], last_course['data'][1]) in student_quarter_data:
-                # We need a check here for summer data!
+                # if (row[1], data[1]) in student_quarter_data:
 
                 student_quarter_data[(row[1], data[1])] = {
                     'id': row[1],
@@ -143,7 +145,7 @@ def parse_quarter(filename):
                 'units': NumericRange(min(unit_vals), max(unit_vals), '[]')  # needs formatting as range
             }
             if temp_meet:
-                meeting.append(temp_meet)
+                meeting.extend(temp_meet)
 
             all_courses.append(last_course)
 

@@ -35,9 +35,9 @@ if __name__ == "__main__":
             result = parse_quarter(filename)
 
             insert_data(conn, 'student', result['student'], b"ON CONFLICT DO NOTHING")
-            insert_data(conn, 'StudentQuarterData', result['studentquarterdata'], b"ON CONFLICT DO NOTHING")
-            insert_data(conn, 'course', result['course'], b"ON CONFLICT DO NOTHING")
-            insert_data(conn, 'meeting', result['meeting'], b"ON CONFLICT DO NOTHING")
+            insert_data(conn, 'StudentQuarterData', result['studentquarterdata'])
+            insert_data(conn, 'course', result['course'])
+            insert_data(conn, 'meeting', result['meeting'])
             insert_data(conn, 'studentcourse', result['studentcourse'])
 
             print("Finished file {}".format(filename))
