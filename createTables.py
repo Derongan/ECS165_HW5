@@ -55,6 +55,7 @@ def create_course_table(conn):
 def create_meeting_table(conn):
     with conn.cursor() as cursor:
         cursor.execute("CREATE TABLE IF NOT EXISTS FakeU.meeting ("
+                       "mid serial,"
                        "days varchar(7),"
                        "starttime time,"
                        "endtime time,"
@@ -65,7 +66,7 @@ def create_meeting_table(conn):
                        "term integer,"
                        "cid integer,"
                        "section integer,"
-                       "PRIMARY KEY(building, term, cid, section),"
+                       "PRIMARY KEY(mid),"
                        "FOREIGN KEY(term, cid, section) references FakeU.course(term, cid ,section)"
                        ");")
 
