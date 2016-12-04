@@ -5,16 +5,18 @@
 
 3a) Calculate the percent of students that attempt 1 – 20 units of ABC or DEF per quarter for every unit increment (e.g. 1, 2, 3,…).
 
-SELECT ((COUNT (DISTINCT id))/ (SUM (totalstudents)/ COUNT (totalstudents))) * 100 AS percentstudents , term, unitstaken
+SELECT
+  ((COUNT (DISTINCT id))/ (SUM (totalstudents)/ COUNT (totalstudents))) * 100 AS percentstudents , term, unitstaken
 
 FROM 
-(SELECT SUM(studentcourse.units AS unitstaken), term, id, COUNT(DISTINCT id) AS totalstudents 
+  (SELECT SUM(studentcourse.units AS unitstaken), term, id, COUNT(DISTINCT id) AS totalstudents 
 
-FROM course NATURAL JOIN studentcourse
+  FROM course NATURAL JOIN studentcourse
 
-WHERE (subject = 'ABC' OR subject = 'DEF') GROUP BY term, id)
+  WHERE (subject = 'ABC' OR subject = 'DEF') GROUP BY term, id)
 
-WHERE (unitstaken < 21 AND unitstaken > 0) GROUP BY term, unitstaken
+WHERE
+  (unitstaken < 21 AND unitstaken > 0) GROUP BY term, unitstaken
 
 # Writing this one assuming we have a table in our database that translates letter grades into floating point values
 # Assuming the table name is gpa with attributes grade [varchar(2)], points [float]
@@ -27,15 +29,17 @@ A = 4.0, A- = 3.7, B+ = 3.3…).
 # Because there's only 2 departments listed in the database, I don't think we need to join it
 # with the course table to check for the equality of the subject to what we wanted (ABC or DEF) so its less painful
 
-SELECT AVG(gpacount.gradepointaverage) AS averagegpa, unitstaken, term
+SELECT
+  AVG(gpacount.gradepointaverage) AS averagegpa, unitstaken, term
 
 FROM
-(SELECT SUM(studentcourse.units) AS unitstaken, term, id, COUNT(DISTINCT id) AS totalstudents
+  (SELECT SUM(studentcourse.units) AS unitstaken, term, id, COUNT(DISTINCT id) AS totalstudents
   FROM course NATURAL JOIN studentcourse
-    WHERE (subject = 'ABC' OR subject = 'DEF') GROUP BY term, id) unitcount,
+  WHERE (subject = 'ABC' OR subject = 'DEF') GROUP BY term, id) unitcount,
 
-(SELECT SUM(points*units)/SUM(units) AS gradepointaverage, id, term
+  (SELECT SUM(points*units)/SUM(units) AS gradepointaverage, id, term
   FROM studentcourse NATURAL JOIN gpa
-    GROUP BY id, term) gpacount,
+  GROUP BY id, term) gpacount
     
-WHERE unitcount.id = gpacount.id AND (unitstaken > 0 AND unitstaken < 21) GROUP BY term, unitstaken
+WHERE
+  unitcount.id = gpacount.id AND (unitstaken > 0 AND unitstaken < 21) GROUP BY term, unitstaken
