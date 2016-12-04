@@ -12,7 +12,9 @@ def parse_quarter(filename):
     temp_meet = {}
 
     courses = {}
-    meeting = {}
+
+    # Meeting is autoincrement primary key due to the bulk of missing data
+    meeting = []
     student = {}
     student_quarter_data = {}
     student_course = {}
@@ -48,7 +50,7 @@ def parse_quarter(filename):
 
                 if first:
                     last_prof = first
-                temp_meet[(data[1], row[2], row[3], row[4], row[5])] = {
+                temp_meet = {
                     'term': data[1],
                     'starttime': times[0],
                     'endtime': times[1],
@@ -107,7 +109,7 @@ def parse_quarter(filename):
                         'crse': data[3],
                         'units': NumericRange(min(unit_vals), max(unit_vals), '[]') # needs formatting as range
                     }
-                    meeting.update(temp_meet)
+                    meeting.append(temp_meet)
 
                     all_courses.append(last_course)
 
