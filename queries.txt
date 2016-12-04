@@ -43,3 +43,25 @@ FROM
     
 WHERE
   unitcount.id = gpacount.id AND (unitstaken > 0 AND unitstaken < 21) GROUP BY term, unitstaken
+  
+3c) Find the easiest and hardest instructors based upon the grades of all the
+students they have taught in their courses. Provide their name and the
+average grade they assigned.
+
+SELECT 
+  instructor, AVG(point) AS profavggrade
+FROM
+  (SELECT
+    point, id, term, cid, section
+  FROM
+    studentcourse NATURAL JOIN gpa) gpacount,
+  (SELECT
+    instructor, cid, term, section
+  FROM
+    meeting) instructordata
+WHERE
+  (gpacount.cid = instructordata.cid AND gpacount.term = instructordata.term AND gpacount.section = instructordata.section)
+  GROUP BY
+    instructor
+  HAVING
+    MAX(profavggrade) OR MIN(profavggrade)
