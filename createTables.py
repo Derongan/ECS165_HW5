@@ -77,7 +77,7 @@ def create_student_course_table(conn):
                        "units integer,"
                        "seat integer,"
                        "status char(2),"
-                       "grade varchar(2),"
+                       "grade varchar(3),"
                        "id integer references FakeU.student,"
                        "term integer,"
                        "cid integer,"

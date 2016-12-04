@@ -37,9 +37,37 @@ def parse_quarter(filename):
                 reading_course = False
                 reading_instructor = False
                 reading_student = False
+
+            elif first == 'INSTRUCTOR(S)':
+                reading_instructor = True
+            elif first == 'SEAT':
+                reading_student = True
             elif reading_course:
                 last_course['data'] = row
                 reading_course = False
+            elif first == 'CID':
+                reading_course = True
+                if last_course and last_course['students']:
+                    data = last_course["data"]
+
+                    unit_vals = tuple(float(x) for x in data[-1].split("-"))
+
+                    courses[(data[1], data[0], data[4])] = {
+                        'term': data[1],
+                        'cid': data[0],
+                        'section': data[4],
+                        'subject': data[2],
+                        'crse': data[3],
+                        'units': NumericRange(min(unit_vals), max(unit_vals), '[]')  # needs formatting as range
+                    }
+                    if temp_meet:
+                        meeting.append(temp_meet)
+
+                    all_courses.append(last_course)
+
+                last_course = {'students': [], 'meetings': []}
+                temp_meet = {}
+                last_prof = None
             elif reading_instructor:
                 data = last_course["data"]
                 # can change building and room to instructor
@@ -75,7 +103,7 @@ def parse_quarter(filename):
                 student[row[1]] = {'id': row[1], 'email': row[10]}
 
                 # if (row[1], last_course['data'][1]) in student_quarter_data:
-                    # We need a check here for summer data!
+                # We need a check here for summer data!
 
                 student_quarter_data[(row[1], data[1])] = {
                     'id': row[1],
@@ -86,7 +114,7 @@ def parse_quarter(filename):
                     'prefname': row[3],
                     'surname': row[2]
                 }
-                
+
                 student_course[(row[1], data[0], data[1], data[4])] = {
                     'id': row[1],
                     'term': data[1],
@@ -94,39 +122,31 @@ def parse_quarter(filename):
                     'section': data[4],
                     'units': row[5],
                     'seat': row[0],
-                    'status': row[10],
-                    'grade': row[9]
+                    'status': row[9],
+                    'grade': row[8]
                 }
                 last_course['students'].append(row)
-            elif first == 'CID':
-                reading_course = True
-                if last_course and last_course['students']:
-                    data = last_course["data"]
 
-                    unit_vals = tuple(float(x) for x in data[-1].split("-"))
 
-                    courses[(data[1], data[0], data[4])] = {
-                        'term': data[1],
-                        'cid': data[0],
-                        'section': data[4],
-                        'subject': data[2],
-                        'crse': data[3],
-                        'units': NumericRange(min(unit_vals), max(unit_vals), '[]') # needs formatting as range
-                    }
-                    if temp_meet:
-                        meeting.append(temp_meet)
+        # Add the last one on if we need to
+        if last_course and last_course['students']:
+            data = last_course["data"]
 
-                    all_courses.append(last_course)
+            unit_vals = tuple(float(x) for x in data[-1].split("-"))
 
-                last_course = {'students': [], 'meetings': []}
-                temp_meet = {}
-                last_prof = None
-            elif first == 'INSTRUCTOR(S)':
-                reading_instructor = True
-            elif first == 'SEAT':
-                reading_student = True
+            courses[(data[1], data[0], data[4])] = {
+                'term': data[1],
+                'cid': data[0],
+                'section': data[4],
+                'subject': data[2],
+                'crse': data[3],
+                'units': NumericRange(min(unit_vals), max(unit_vals), '[]')  # needs formatting as range
+            }
+            if temp_meet:
+                meeting.append(temp_meet)
 
-        all_courses.append(last_course)
+            all_courses.append(last_course)
+
         return {
             'student': student,
             'studentquarterdata': student_quarter_data,
