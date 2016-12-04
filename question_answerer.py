@@ -19,34 +19,55 @@ GRADE_MAP = {
 }
 
 
-def query_question(conn, name):
-    with open("queries/{}.sql".format(name)) as fp:
-        query = fp.read()
 
-        if not query:
-            return "No sql found"
+def answer_3a(conn):
+    with open("queries/3a.sql") as fp:
+        query = fp.read()
 
         with conn.cursor() as cursor:
             cursor.execute(query)
-            return cursor.fetchall()
+            results = cursor.fetchall()
 
-
-def answer_3a(conn):
-    results = query_question(conn, "3a")
-
-    if PRINT_VALUES:
-        print("Units\t|\tPercent Taking")
-        for item in results:
-            print("{}\t\t|\t{}".format(item[0], item[1]*100))
-
+            if PRINT_VALUES:
+                print("Question 3a")
+                print("Units\t|\tPercent Taking")
+                for item in results:
+                    print("{}\t\t|\t{}".format(item[0], item[1] * 100))
 
 
 def answer_3b(conn):
-    result = query_question(conn, "3b")
+    with open("queries/3b.sql") as fp:
+        query = fp.read()
 
-    #TODO
+    if PRINT_VALUES:
+        print("Question 3b")
 
+    for i in range(1, 21):
+        with conn.cursor() as cursor:
+            cursor.execute(query.format(i))
+            result = cursor.fetchall()
 
+        quarter_dict = {}
+
+        for item in result:
+            grade = item[0]
+            quarter = item[1]
+            units = item[2]
+            if item[1] not in quarter_dict:
+                if grade in GRADE_MAP:
+                    if quarter in quarter_dict:
+                        quarter_dict[quarter]['gp'] += float(units) * GRADE_MAP[grade]
+                        quarter_dict[quarter]['units'] += float(units)
+
+                    else:
+                        quarter_dict[quarter] = {'gp': float(units) * GRADE_MAP[grade], 'units': float(units)}
+
+        averages = [x['gp'] / x['units'] for x in quarter_dict.values() if x['units'] > 0.0]
+
+        average = sum(averages) / len(averages)
+
+        if PRINT_VALUES:
+            print("On average students taking {} units have a {} quarter GPA".format(i, average))
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ WITH unitgrade AS (SELECT units, grade, term FROM
 	FROM FakeU.studentcourse
 	GROUP BY id,term)
 	AS unitbyquarter
-WHERE numunit=2)
+WHERE numunit={})
 AS idquarters
 JOIN FakeU.studentcourse USING(id, term))
 
