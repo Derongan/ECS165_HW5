@@ -34,3 +34,4 @@ if __name__ == "__main__":
             insert_data(conn, 'student', result['student'], b"ON CONFLICT DO NOTHING")
             insert_data(conn, 'StudentQuarterData', result['studentquarterdata'], b"ON CONFLICT DO NOTHING")
             insert_data(conn, 'course', result['course'])
+            insert_data(conn, 'meeting', result['meeting'])
