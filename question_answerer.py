@@ -1,4 +1,5 @@
 import psycopg2 as psy
+from itertools import groupby
 
 PRINT_VALUES = True
 
@@ -92,8 +93,7 @@ def answer_3c(conn):
                 prof_dict[prof] = {'gp': float(units) * GRADE_MAP[grade], 'units': float(units)}
 
     for prof in prof_dict:
-        prof_dict[prof] = prof_dict[prof]['gp']/prof_dict[prof]['units']
-
+        prof_dict[prof] = prof_dict[prof]['gp'] / prof_dict[prof]['units']
 
     pkey = list(prof_dict.keys())
     pvalue = list(prof_dict.values())
@@ -105,8 +105,62 @@ def answer_3c(conn):
     min_idx = [x for x, j in enumerate(pvalue) if j == mn]
 
     if PRINT_VALUES:
-        print("The easiest professor(s) are {} with a GPA of {}".format(" and, ".join(["'{}'".format(pkey[i]) for i in max_idx]), mx))
-        print("The hardest professor(s) are {} with a GPA of {}".format(" and, ".join(["'{}'".format(pkey[i]) for i in min_idx]), mn))
+        print("The easiest professor(s) are {} with a GPA of {}".format(
+            " and, ".join(["'{}'".format(pkey[i]) for i in max_idx]), mx))
+        print("The hardest professor(s) are {} with a GPA of {}".format(
+            " and, ".join(["'{}'".format(pkey[i]) for i in min_idx]), mn))
+
+
+def answer_3d(conn):
+    with open("queries/3d.sql") as fp:
+        query = fp.read()
+
+    with conn.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    result.sort(key=lambda a: a[2])
+    groups = (groupby(result, key=lambda a: a[2]))
+
+    for crse, group in groups:
+        group = list(group)
+        group.sort(key=lambda a: a[0])
+        profs = groupby(group, lambda a: a[0])
+
+        pnp = False
+
+        if all([x[1] not in GRADE_MAP.keys() for x in group]):
+            pnp = True
+
+        prof_dict = {}
+
+        if pnp:
+            for prof, grades in profs:
+                grades = list(grades)
+                prof_dict[prof] = sum([1 if x[1] == 'P' else 0 for x in grades]) / len(grades)
+        else:
+            for prof, grades in profs:
+                grades = list(grades)
+                prof_dict[prof] = sum([GRADE_MAP[x[1]] for x in grades if x[1] in GRADE_MAP]) / len(
+                    [GRADE_MAP[x[1]] for x in grades if x[1] in GRADE_MAP])
+
+        pkey = list(prof_dict.keys())
+        pvalue = list(prof_dict.values())
+
+        mx = max(pvalue)
+        mn = min(pvalue)
+
+        max_idx = [x for x, j in enumerate(pvalue) if j == mx]
+        min_idx = [x for x, j in enumerate(pvalue) if j == mn]
+
+        type = "pass rate" if pnp else "GPA"
+
+        if PRINT_VALUES:
+            print("The easiest professor(s) for {} are {} with a {} of {}".format(crse,
+                " and, ".join(["'{}'".format(pkey[i]) for i in max_idx]), type, mx))
+            print("The hardest professor(s) are {} for {} with a {} of {}".format(crse,
+                " and, ".join(["'{}'".format(pkey[i]) for i in min_idx]), type, mn))
+
 
 
 if __name__ == "__main__":
@@ -114,3 +168,4 @@ if __name__ == "__main__":
         answer_3a(conn)
         # answer_3b(conn)
         answer_3c(conn)
+        answer_3d(conn)
