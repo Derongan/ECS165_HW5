@@ -19,7 +19,6 @@ GRADE_MAP = {
 }
 
 
-
 def answer_3a(conn):
     with open("queries/3a.sql") as fp:
         query = fp.read()
@@ -70,7 +69,48 @@ def answer_3b(conn):
             print("On average students taking {} units have a {} quarter GPA".format(i, average))
 
 
+def answer_3c(conn):
+    with open("queries/3c.sql") as fp:
+        query = fp.read()
+
+    with conn.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+    prof_dict = {}
+
+    for item in result:
+        prof = item[0]
+        grade = item[1]
+        units = item[2]
+
+        if grade in GRADE_MAP:
+            if prof in prof_dict:
+                prof_dict[prof]['gp'] += float(units) * GRADE_MAP[grade]
+                prof_dict[prof]['units'] += float(units)
+            else:
+                prof_dict[prof] = {'gp': float(units) * GRADE_MAP[grade], 'units': float(units)}
+
+    for prof in prof_dict:
+        prof_dict[prof] = prof_dict[prof]['gp']/prof_dict[prof]['units']
+
+
+    pkey = list(prof_dict.keys())
+    pvalue = list(prof_dict.values())
+
+    mx = max(pvalue)
+    mn = min(pvalue)
+
+    max_idx = [x for x, j in enumerate(pvalue) if j == mx]
+    min_idx = [x for x, j in enumerate(pvalue) if j == mn]
+
+    if PRINT_VALUES:
+        print("The easiest professor(s) are {} with a GPA of {}".format(" and, ".join(["'{}'".format(pkey[i]) for i in max_idx]), mx))
+        print("The hardest professor(s) are {} with a GPA of {}".format(" and, ".join(["'{}'".format(pkey[i]) for i in min_idx]), mn))
+
+
 if __name__ == "__main__":
     with psy.connect(database="FakeU", user="fakeuser", password="") as conn:
         answer_3a(conn)
-        answer_3b(conn)
+        # answer_3b(conn)
+        answer_3c(conn)
