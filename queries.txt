@@ -1,0 +1,41 @@
+# The Format of this text file is in the form of: 
+# "<question number>')'<question>'\n\n'<query>" where '\n' means newline
+# I'm writing the SQL in uppercase and the others in lowercase 
+# [unless if its in single quotes which means its a value from our table]
+
+3a) Calculate the percent of students that attempt 1 – 20 units of ABC or DEF per quarter for every unit increment (e.g. 1, 2, 3,…).
+
+SELECT ((COUNT (DISTINCT id))/ (SUM (totalstudents)/ COUNT (totalstudents))) * 100 AS percentstudents , term, unitstaken
+
+FROM 
+(SELECT SUM(studentcourse.units AS unitstaken), term, id, COUNT(DISTINCT id) AS totalstudents 
+
+FROM course NATURAL JOIN studentcourse
+
+WHERE (subject = 'ABC' OR subject = 'DEF') GROUP BY term, id)
+
+WHERE (unitstaken < 21 AND unitstaken > 0) GROUP BY term, unitstaken
+
+# Writing this one assuming we have a table in our database that translates letter grades into floating point values
+# Assuming the table name is gpa with attributes grade [varchar(2)], points [float]
+# [A+ = 4.0, A = 4.0, A- = 3.7, B+ = 3.3, B = 3.0, B- = 2.7, C+ = 2.3, C = 2.0, C- = 1.7, D+ = 1.3, D = 1, D- = 0.7, F = 0]
+
+3b) Calculate the average GPA for the students that take each number of units
+from part a. Assume that the grades have standard grade points (A+ = 4.0,
+A = 4.0, A- = 3.7, B+ = 3.3…).
+
+# Because there's only 2 departments listed in the database, I don't think we need to join it
+# with the course table to check for the equality of the subject to what we wanted (ABC or DEF) so its less painful
+
+SELECT AVG(gpacount.gradepointaverage) AS averagegpa, unitstaken, term
+
+FROM
+(SELECT SUM(studentcourse.units) AS unitstaken, term, id, COUNT(DISTINCT id) AS totalstudents
+  FROM course NATURAL JOIN studentcourse
+    WHERE (subject = 'ABC' OR subject = 'DEF') GROUP BY term, id) unitcount,
+
+(SELECT SUM(points*units)/SUM(units) AS gradepointaverage, id, term
+  FROM studentcourse NATURAL JOIN gpa
+    GROUP BY id, term) gpacount,
+    
+WHERE unitcount.id = gpacount.id AND (unitstaken > 0 AND unitstaken < 21) GROUP BY term, unitstaken
